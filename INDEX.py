@@ -41,7 +41,7 @@ st.markdown("""
 st.markdown("<div class='title'>📺 Global IPTV Streams</div>", unsafe_allow_html=True)
 
 # URLs for different playlist categories
-MAIN_M3U_URL = "https://iptv-org.github.io/iptv/index.m3u"
+MAIN_M3U_URL = "https://raw.githubusercontent.com/Deshiindia/DESIINDIA/refs/heads/main/iPTV-Free-List_XXX.m3u"
 LIVE_M3U_URL = "https://ip-tv.app/XXX"
 STREAM_M3U_URL = "https://raw.githubusercontent.com/AAAAAEXQOSyIpN2JZ0ehUQ/iPTV-FREE-LIST/master/iPTV-Free-List_XXX.m3u"
 
