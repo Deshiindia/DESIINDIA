@@ -5,7 +5,7 @@ import random
 
 # Set up page configuration with an updated theme
 st.set_page_config(
-    page_title="Global IPTV Streams",
+    page_title="DESHIINDIA IPTV Streams",
     layout="wide",
     initial_sidebar_state="expanded"
 )
