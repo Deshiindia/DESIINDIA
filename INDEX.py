@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 from streamlit_player import st_player
 import random
+import threading
 
 # Set up page configuration with an updated theme
 st.set_page_config(
@@ -45,8 +46,8 @@ MAIN_M3U_URL = "https://raw.githubusercontent.com/Deshiindia/DESIINDIA/refs/head
 LIVE_M3U_URL = "https://ip-tv.app/XXX"
 STREAM_M3U_URL = "https://raw.githubusercontent.com/AAAAAEXQOSyIpN2JZ0ehUQ/iPTV-FREE-LIST/master/iPTV-Free-List_XXX.m3u"
 
-# Cache channel loading
-@st.cache_data
+# Cache channel loading with a time-to-live
+@st.cache_data(ttl=600)
 def load_channels(url):
     channels = []
     try:
@@ -63,10 +64,16 @@ def load_channels(url):
         st.error(f"Error loading channels from {url}: {e}")
     return channels
 
-# Load all channels
-main_channels = load_channels(MAIN_M3U_URL)
-live_channels = load_channels(LIVE_M3U_URL)
-stream_channels = load_channels(STREAM_M3U_URL)
+# Load all channels concurrently
+main_channels = live_channels = stream_channels = []
+
+def load_all_channels():
+    global main_channels, live_channels, stream_channels
+    main_channels = load_channels(MAIN_M3U_URL)
+    live_channels = load_channels(LIVE_M3U_URL)
+    stream_channels = load_channels(STREAM_M3U_URL)
+
+threading.Thread(target=load_all_channels).start()
 
 # Sidebar controls with icons for an interactive experience
 st.sidebar.title("📋 Channel Controls")
@@ -90,13 +97,13 @@ if 'selected_channel' not in st.session_state:
     st.session_state.selected_channel_index = 0  # Index of selected channel
 
 if 'main_visible_count' not in st.session_state:
-    st.session_state.main_visible_count = 8
+    st.session_state.main_visible_count = 4  # Reduced count for faster initial load
 
 if 'live_visible_count' not in st.session_state:
-    st.session_state.live_visible_count = 8
+    st.session_state.live_visible_count = 4
 
 if 'stream_visible_count' not in st.session_state:
-    st.session_state.stream_visible_count = 8
+    st.session_state.stream_visible_count = 4
 
 # Navigation function for next and previous channels
 def change_channel(direction, channels):
@@ -146,7 +153,7 @@ def display_channel_list(channels, visible_count_key, section_key):
         # Expand list with "Show More"
         if visible_count < len(channels):
             if st.button("Show More", key=f"{section_key}_show_more"):
-                st.session_state[visible_count_key] += 8
+                st.session_state[visible_count_key] += 4  # Load 4 channels at a time
     else:
         st.warning(f"No channels available in {section_key.capitalize()} Channels.")
 
